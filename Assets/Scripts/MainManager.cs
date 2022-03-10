@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,13 +10,27 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
-    
+
+    [SerializeField] private Text highScoreText;
+    [SerializeField] private Text playerText;
+
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
+    private void Awake()
+    {
+        string currentPlayer = DataManager.Instance.playerName;
+        string highScoreHolder = DataManager.Instance.highScoreHolder;
+        int highScore = DataManager.Instance.highScore;
+
+        playerText.text = currentPlayer;
+        if (highScoreHolder != null)
+            highScoreText.text = "High Score: " + highScoreHolder + ": " + highScore;
+        else
+            highScoreText.text = "The high score is up for grabs!";
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -72,5 +84,15 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (m_Points > DataManager.Instance.highScore)
+            SetHighScore();
+    }
+    public void SetHighScore()
+    {
+        DataManager.Instance.highScore = m_Points;
+        DataManager.Instance.highScoreHolder = DataManager.Instance.playerName;
+
+        DataManager.Instance.SaveHighScore();
     }
 }
